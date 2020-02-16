@@ -25,6 +25,7 @@
 
 <script>
 import {Button,Row ,Col,Form,Input,FormItem} from "element-ui"
+import axios from "axios"
 export default {
   name: 'Login',
   data(){
@@ -85,6 +86,11 @@ export default {
         //   console.log(err);
         //   this.$loading.hide()
         // })
+        axios.post("http:127.0.0.1:8000/cms/login",params).then(res=>{
+           console.log(res)
+        }).catch(err=>{
+           console.log(err)
+        })
       })
     }
   }
