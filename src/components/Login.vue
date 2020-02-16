@@ -1,105 +1,120 @@
-
 <template>
-<div class="login-container">
-   <!-- 登录界面网址： http://localhost:8082/#/login-->
-  <div class="logo-group"></div>
-  <div class="form-group">
-    <van-cell-group>
-      <van-field v-model="telephone" center clearable placeholder="请输入手机号">
-        <van-button slot="button" size="small" type="default" plain :disabled="smsCodeButtonDisabled" @click="sendSmsCode">{{sendtext}}</van-button>
-      </van-field>
-    </van-cell-group>
-    <van-cell-group>
-      <van-field v-model="smscode" placeholder="请输入短信验证码"></van-field>
-    </van-cell-group>
-    <van-button type="primary" class="submit-btn" block :disabled="submitButtonDisabled" @click="onLogin">登录</van-button>
+  <div class="login-container">
+    <el-row >
+      <el-col :span="12" :offset="6">
+      <h1 class="page-title">CDownPace后台管理系统</h1>
+      <el-form ref="loginForm" :model="loginForm" label-width="80px" class="login-form" :rules="rules">
+        <el-form-item label="手机号码" prop="username">
+          <el-input v-model="loginForm.username"></el-input>
+
+        </el-form-item>
+           <el-form-item label="密码" prop="password">
+             <el-input v-model="loginForm.password" type="password"></el-input>
+           </el-form-item>
+           <el-form-item>
+             <el-button type="primary" @click="onSubmit">登录</el-button>
+           </el-form-item>
+        </el-form>
+        
+    </el-col>
+    </el-row>
+
+    
   </div>
-</div>
 </template>
 
-<script type="text/ecmascript-6">
-import {Field,CellGroup,Button,Toast} from "vant"
+<script>
+import {Button,Row ,Col,Form,Input,FormItem} from "element-ui"
+import axios from "axios"
 export default {
-  name: "Login",
-  data() {
+  name: 'Login',
+  data(){
+    let validateTel = (rule, value, callback) => {
+      if(!value.match(/1[3456789]\d{9}/)){
+        callback(new Error("请输入正确的手机号码！"))
+      }else{
+        callback()
+      }
+    }
     return {
-      telephone: "",
-      smscode: "",
-      sendtext: "发送验证码",
-      timeout: 0
+      loginForm:{
+         username:"",
+         password:""
+      },
+      rules:{
+         username: [
+          {required: true,message: "请输入手机号码！",trigger: "blur"},
+          {validator: validateTel,trigger: "blur"}
+        ],
+        password: [
+          {required: true,message: "请输入密码！",trigger: "blur"},
+          {min: 6, max: 20,message: "密码字符应该在6-20之间！",trigger: "blur"},
+        ]
+      }
     }
   },
-  components: {
-    [Field.name]: Field,
-    [CellGroup.name]: CellGroup,
-    [Button.name]: Button
+   components: {
+    // Login,
+    [Button.name]:Button,
+    [Row.name]:Row,
+    [Col.name]:Col,
+    [Form.name]:Form,
+    [Input.name]:Input,
+    [FormItem.name]:FormItem 
   },
-  computed: {
-    smsCodeButtonDisabled(){
-      if(!this.telephone.match(/1[3456789]\d{9}/) || this.timeout > 0){
-        return true
-      }
-      return false
-    },
-    submitButtonDisabled(){
-      if(!this.telephone.match(/1[3456789]\d{9}/) || !this.smscode.match(/\d{4}/)){
-        return true
-      }
-      return false
-    }
-  },
-  methods: {
-    sendSmsCode(){
-      const that = this;
-      setTimeout(function() {
-        Toast("验证码发送成功")
-        that.timeout = 60;
-        const interval = setInterval(() => {
-          that.timeout--;
-          that.sendtext = that.timeout + "s后重新发送"
-          if(that.timeout == 0){
-            clearInterval(interval)
-            that.sendtext = "发送验证码"
-          }
-        }, 1000);
-      },500)
-    },
-    onLogin(){
-      this.$http.login({
-        telephone: this.telephone,
-        smscode: this.smscode
-      }).then(res => {
-        const data = res.data
-        const token = data.token
-        const user = data.user
-        this.$auth.setUserToken(user,token)
-        const from = this.$route.query['from']
-        if(from){
-          this.$router.push(from)
-        }else{
-          this.$router.replace('/')
+  methods:{
+    onSubmit(){
+      this.$refs['loginForm'].validate(valid => {
+        if(!valid){
+          console.log("验证失败！")
+          return
         }
+        const params = {
+          username: this.loginForm.username,
+          password: this.loginForm.password
+        }
+        console.log(params)
+        // this.$loading.show()
+        // this.$http.login(params).then(res => {
+        //   const data = res.data;
+        //   const token = data.token;
+        //   const user = data.user;
+        //   this.$auth.setUserToken(user,token)
+        //   this.$router.push("/")
+        //   this.$loading.hide()
+        // }).catch(err => {
+        //   console.log(err);
+        //   this.$loading.hide()
+        // })
+        axios.post("http:127.0.0.1:8000/cms/login",params).then(res=>{
+          //  console.log(res)
+           const data=res.data;
+           const token=data.token;
+           const user=data.user;
+           this.$auth.setUserToken(user,token)
+           this.$router.push("/")
+        }).catch(err=>{
+           console.log(err)
+        })
       })
     }
   }
 }
 </script>
 
-<style scoped lang="scss">
+<style  lang="scss">
+body{
+  background-color: #eee;
+}
 .login-container{
-  .logo-group{
-    width: 100%;
-    height: 200px;
-    background-image: url("http://s3plus.meituan.net/v1/mss_e2821d7f0cfe4ac1bf9202ecf9590e67/cdn-prod/file:9096d347/7a5ff05b334e0debdd10954a7f5d4789.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 66px; 
+  padding-top: 80px;
+  .page-title{
+    text-align: center
   }
-  .form-group{
-    padding: 0 20px;
-  }
-  .submit-btn{
-    margin-top: 20px;
+  .login-form{
+    padding-top:40px;
   }
 }
+
+
 </style>
