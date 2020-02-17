@@ -86,7 +86,7 @@ export default {
         //   console.log(err);
         //   this.$loading.hide()
         // })
-        axios.post("http:127.0.0.1:8000/cms/login",params).then(res=>{
+        axios.post("http://127.0.0.1:8000/cms/login",params).then(res=>{
           //  console.log(res)
            const data=res.data;
            const token=data.token;

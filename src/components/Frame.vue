@@ -9,9 +9,45 @@
       </div>
 
   <el-container>
-    <el-aside width="200px" class="aside">这是Aside</el-aside>
+    <el-aside width="200px" class="aside">
+      <el-row class="menu-row">
+          <el-col :span="24">
+            <el-menu
+              default-active="/"
+              background-color="#545c64"
+              class="el-menu"
+              active-text-color="#fff"
+              text-color="#ddd"
+              :router="true"
+              >
+              <el-menu-item index="/">
+                <i class="el-icon-s-home"></i>
+                <span slot="title">首页</span>
+              </el-menu-item>
+              <el-menu-item index="/merchant">
+                <i class="el-icon-menu"></i>
+                <span slot="title">商家</span>
+              </el-menu-item>
+              <el-menu-item index="/user">
+                <i class="el-icon-user-solid"></i>
+                <span slot="title">用户</span>
+              </el-menu-item>
+              <el-menu-item index="/order">
+                <i class="el-icon-s-order"></i>
+                <span slot="title">订单</span>
+              </el-menu-item>
+            </el-menu>
+          </el-col>
+        </el-row>
+
+
+    </el-aside>
     <el-container>
-      <el-main class="main">这是Main</el-main>
+      <el-main class="main">
+        <!-- 这是Main -->
+        <router-view></router-view>
+      </el-main>
+
       <el-footer class="footer">这是Footer</el-footer>
     </el-container>
   </el-container>
@@ -19,8 +55,8 @@
 </div>
 </template>
 <script type='text/ecmascript-6'>
-import {Container,Header,Aside,Main,Footer} from 'element-ui'
-export default{
+import {Container,Header,Aside,Main,Footer,Row,Col,Menu,MenuItem} from 'element-ui'
+export default {
 name: "Frame",
 data(){
 return {}
@@ -31,6 +67,10 @@ components: {
   [Aside.name]:Aside,
   [Main.name]:Main,
   [Footer.name]:Footer,
+  [Row.name]: Row,
+    [Col.name]: Col,
+    [Menu.name]: Menu,
+    [MenuItem.name]: MenuItem
 },
 methods: {
     onLogout(){
@@ -72,7 +112,12 @@ methods: {
       }
     }
   .aside{
-      background-color:yellow;
+      background-color: #545c64;
+      .el-menu{
+      .is-active{
+        background-color: #434a50!important;
+      }
+    }
   }
   .main{
       background-color:pink;
@@ -80,5 +125,12 @@ methods: {
   .footer{
       background-color:green;
   }
+}
+</style>
+
+<style scoped>
+/* 去除左面白边 */
+.aside >>> .el-menu{
+  border-right: none;
 }
 </style>
